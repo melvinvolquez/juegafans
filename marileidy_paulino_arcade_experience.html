@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soy Fan De Marileidy - Juego & Fan Zone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        domRed: '#CE1126',
+                        domBlue: '#002D62',
+                        gold: '#FFD700',
+                        accentGreen: '#10B981',
+                        darkCard: '#1E293B'
+                    },
+                    fontFamily: {
+                        teko: ['Teko', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+        .font-teko {
+            font-family: 'Teko', sans-serif;
+        }
+        .glow-gold {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(0, 45, 98, 0.6);
+        }
+        .glow-red {
+            box-shadow: 0 0 20px rgba(206, 17, 38, 0.5);
+        }
+        canvas {
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            touch-action: none;
+        }
+        .btn-arcade {
+            transition: all 0.15s ease;
+            position: relative;
+            top: 0;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.4);
+        }
+        .btn-arcade:active {
+            top: 4px;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.4);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFD700;
+        }
+        .floating-quote {
+            animation: floatUp 3s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+            20% { opacity: 1; transform: translateY(0) scale(1); }
+            80% { opacity: 1; transform: translateY(-30px) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.95); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-gold selection:text-black">
+
+    <header class="bg-gradient-to-r from-domBlue via-slate-900 to-domRed border-b-4 border-gold shadow-2xl relative z-20">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Logo & Badge -->
+                <div class="flex items-center gap-3 text-center md:text-left">
+                    <div class="w-14 h-14 rounded-full bg-gold flex items-center justify-center text-domBlue font-extrabold text-2xl border-2 border-white shadow-lg animate-pulse">
+                        <i class="fa-solid font-bold fa-bolt text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-wider uppercase font-teko leading-none text-white drop-shadow-md">
+                            SOY FAN DE <span class="text-gold">MARILEIDY</span>
+                        </h1>
+                        <p class="text-xs sm:text-sm text-slate-300 font-medium">
+                            <i class="fa-solid fa-flag text-domRed mr-1"></i> Orgullo Dominicano & Game Hub 400m
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Stats & Counters -->
+                <div class="flex items-center gap-4 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 text-xs sm:text-sm">
+                    <div class="text-center px-2">
+                        <span class="block text-gold font-bold text-lg leading-tight" id="fansCount">158,420</span>
+                        <span class="text-slate-400 text-[10px] uppercase tracking-wider">Fans en la Meta</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-700"></div>
+                    <div class="text-center px-2">
+                        <span class="block text-accentGreen font-bold text-lg leading-tight" id="globalBest">48.14s</span>
+                        <span class="text-slate-400 text-[10px] uppercase tracking-wider">Récord Nacional</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex justify-center md:justify-start gap-2 mt-4 pt-3 border-t border-slate-700/60 overflow-x-auto w-full pb-1">
+                <button onclick="switchTab('game')" id="tab-game" class="tab-btn bg-gold text-slate-950 font-bold px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-gamepad"></i> Pista Arcade
+                </button>
+                <button onclick="switchTab('quotes')" id="tab-quotes" class="tab-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-quote-left text-gold"></i> Frases Fe & Poder
+                </button>
+                <button onclick="switchTab('trophies')" id="tab-trophies" class="tab-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-gold"></i> Logros & Medallas
+                </button>
+                <button onclick="switchTab('community')" id="tab-community" class="tab-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-domRed"></i> Muro de Fans
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- SECTION 1: GAME SECTION -->
+        <section id="sec-game" class="block space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Canvas Game View -->
+                <div class="lg:col-span-3 bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-2xl relative flex flex-col items-center">
+                    
+                    <!-- HUD Header -->
+                    <div class="w-full flex justify-between items-center bg-slate-900/90 px-4 py-2 rounded-xl mb-3 border border-slate-700">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase">Metros Recorridos</span>
+                                <span id="distanceText" class="text-2xl font-teko font-bold text-gold tracking-wide">0 m</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block uppercase">Puntaje</span>
+                                <span id="scoreText" class="text-2xl font-teko font-bold text-white tracking-wide">0000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="text-right hidden sm:block">
+                                <span class="text-xs text-slate-400 block uppercase">Mejor Marca</span>
+                                <span id="highScoreText" class="text-lg font-teko text-accentGreen font-bold">0 m</span>
+                            </div>
+                            <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 bg-slate-800 hover:bg-slate-700 text-gold rounded-lg border border-slate-600">
+                                <i class="fa-solid fa-volume-high text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Box -->
+                    <div class="relative w-full overflow-hidden flex justify-center items-center bg-slate-950 rounded-xl">
+                        <canvas id="gameCanvas" width="800" height="400" class="w-full h-auto max-h-[450px] object-contain"></canvas>
+                        
+                        <!-- Floating Encouragement Quotes Overlay -->
+                        <div id="quoteOverlay" class="absolute top-10 left-1/2 -translate-x-1/2 pointer-events-none w-11/12 text-center z-10"></div>
+
+                        <!-- Start / Game Over Overlay -->
+                        <div id="gameOverlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
+                            <div class="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center text-gold mb-3 animate-bounce">
+                                <i class="fa-solid fa-person-running text-3xl"></i>
+                            </div>
+                            <h2 id="overlayTitle" class="text-4xl sm:text-5xl font-teko font-bold text-white tracking-wider mb-2">
+                                ¡CORRE POR LA GLORIA!
+                            </h2>
+                            <p id="overlayDesc" class="text-sm sm:text-base text-slate-300 max-w-md mb-6">
+                                Salta las vallas, esquiva obstáculos y atrapa las medallas de oro para demostrar el orgullo dominicano.
+                            </p>
+                            <button id="startBtn" onclick="startGame()" class="btn-arcade bg-gradient-to-r from-gold via-amber-400 to-yellow-500 text-slate-950 font-extrabold text-lg px-8 py-3.5 rounded-xl border-2 border-white shadow-lg uppercase tracking-wider flex items-center gap-3">
+                                <i class="fa-solid fa-play"></i> Iniciar Carrera
+                            </button>
+                            <span class="text-xs text-slate-400 mt-4">
+                                <i class="fa-solid fa-keyboard"></i> Presiona <kbd class="px-2 py-1 bg-slate-800 rounded border border-slate-600 text-white">Espacio</kbd> o toca la pantalla para saltar
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Mobile / On-screen Touch Controls -->
+                    <div class="w-full flex justify-between items-center mt-4 gap-4">
+                        <div class="text-xs text-slate-400 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-accentGreen inline-block"></span> Tocando la pantalla salta el atleta.
+                        </div>
+                        <button onclick="triggerJump()" class="btn-arcade bg-domBlue hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl border border-blue-400 flex items-center gap-2 active:scale-95 transition-transform md:hidden">
+                            <i class="fa-solid fa-arrow-up text-gold"></i> ¡SALTAR!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard & Motivation Card -->
+                <div class="space-y-6">
+                    <!-- Leaderboard -->
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-700 pb-2">
+                            <h3 class="font-teko text-2xl text-gold font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-ranking-star"></i> Tabla de Campeones
+                            </h3>
+                            <span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Top Fans</span>
+                        </div>
+                        <div class="space-y-3" id="leaderboardList">
+                            <!-- Populated dynamically JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quote Card -->
+                    <div class="bg-gradient-to-br from-domBlue/50 to-slate-800 p-5 rounded-2xl border border-domBlue/60 relative overflow-hidden shadow-xl">
+                        <i class="fa-solid fa-quote-right absolute -right-2 -bottom-2 text-6xl text-white/5 pointer-events-none"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider text-gold block mb-1">
+                            <i class="fa-solid fa-cross"></i> Mensaje Inspirador
+                        </span>
+                        <blockquote id="sideQuoteText" class="text-sm italic text-slate-200 leading-relaxed font-light">
+                            "Dios no te lleva a la meta sin antes prepararte para la carrera. Confía en el proceso y en el propósito que Él tiene para ti."
+                        </blockquote>
+                        <span class="block text-right text-xs font-semibold text-gold mt-2">- Marileidy Paulino</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: QUOTES -->
+        <section id="sec-quotes" class="hidden space-y-6">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h2 class="text-4xl font-teko font-bold text-gold tracking-wide">FRASES DE FE, ESFUERZO Y VICTORIA</h2>
+                <p class="text-slate-300 text-sm">Palabras que inspiran a una nación y motivan a los fans a nunca rendirse en sus metas.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="quotesGrid">
+                <!-- Dynamically filled -->
+            </div>
+        </section>
+
+        <!-- SECTION 3: TROPHIES & ACHIEVEMENTS -->
+        <section id="sec-trophies" class="hidden space-y-6">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h2 class="text-4xl font-teko font-bold text-gold tracking-wide">GALERÍA DE LOGROS CUMPLIDOS</h2>
+                <p class="text-slate-300 text-sm">Histórico de medallas y récords que Marileidy ha regalado a la República Dominicana.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="trophiesGrid">
+                <!-- Dynamically filled -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: COMMUNITY WALL -->
+        <section id="sec-community" class="hidden space-y-6">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl mb-8">
+                    <h2 class="text-2xl font-teko font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-gold"></i> Deja tu mensaje de apoyo a Marileidy
+                    </h2>
+                    <form id="commentForm" onsubmit="addComment(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="text" id="fanName" placeholder="Tu nombre o apodo" required class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-gold">
+                            <input type="text" id="fanCity" placeholder="Ciudad / País (ej. Santo Domingo)" required class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-gold">
+                        </div>
+                        <textarea id="fanMessage" rows="3" placeholder="¡Escribe tus palabras de aliento!" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-gold"></textarea>
+                        <button type="submit" class="btn-arcade bg-domRed hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Publicar Mensaje
+                        </button>
+                    </form>
+                </div>
+
+                <div class="space-y-4" id="commentsContainer">
+                    <!-- Dynamic Comments -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-950 border-t border-slate-800 py-6 text-center text-xs text-slate-500 mt-12">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-domRed"></div>
+                <div class="w-3 h-3 rounded-full bg-white"></div>
+                <div class="w-3 h-3 rounded-full bg-domBlue"></div>
+                <span class="font-bold text-slate-400">Página tributo interactiva creada por y para los fans de Marileidy Paulino.</span>
+            </div>
+            <p>© 2026 Soy Fan De Marileidy Arcade. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const quotesData = [
+            "Dios no te lleva a la meta sin antes prepararte para la carrera. Confía en el proceso y en el propósito que Él tiene para ti.",
+            "El trabajo duro vence al talento cuando el talento no trabaja duro.",
+            "Correr con la bandera dominicana en el pecho es el honor más grande del mundo.",
+            "La disciplina te lleva a donde la motivación no alcanza.",
+            "Cada segundo en la pista es un testimonio de fe y constancia.",
+            "La gloria no es solo ganar la medalla, es levantarte cada mañana a dar lo mejor de ti."
+        ];
+
+        const trophiesData = [
+            { year: '2024', event: 'Juegos Olímpicos París', title: 'Medalla de Oro (400m)', time: '48.17s (Récord Olímpico)', icon: 'fa-medal text-yellow-400' },
+            { year: '2023', event: 'Mundial de Atletismo Budapest', title: 'Campeona Mundial (400m)', time: '48.76s (Récord Nacional)', icon: 'fa-trophy text-yellow-400' },
+            { year: '2022', event: 'Liga de Diamante', title: 'Ganadora del Trofeo de Diamante', time: '48.99s', icon: 'fa-gem text-cyan-400' },
+            { year: '2020', event: 'Juegos Olímpicos Tokio', title: 'Doble Medalla de Plata', time: '400m e Relevos 4x400', icon: 'fa-award text-slate-300' }
+        ];
+
+        let commentsList = [
+            { name: "Carlos Rosario", city: "Santiago, RD", text: "¡Marileidy eres el orgullo de todo el pueblo dominicano! ¡Sigue volando en la pista!", time: "Hace 10 min" },
+            { name: "Ana María Matos", city: "Santo Domingo", text: "Me encanta esta página y el jueguito. ¡Dios la bendiga siempre!", time: "Hace 1 hora" },
+            { name: "José Miguel", city: "New York, USA", text: "Desde el Bronx apoyando a nuestra campeona de oro.", time: "Hace 3 horas" }
+        ];
+
+        let leaderBoardData = [
+            { name: "Marileidy Fan #1", score: 2840, distance: "1,420 m" },
+            { name: "Dominicano100%", score: 2100, distance: "1,050 m" },
+            { name: "QuisqueyaSpeed", score: 1650, distance: "825 m" },
+            { name: "TigreDeLaPista", score: 1200, distance: "600 m" }
+        ];
+
+        // Sound System (Web Audio API Synthesizer)
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'coin') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggleBtn');
+            btn.innerHTML = soundEnabled ? 
+                '<i class="fa-solid fa-volume-high text-lg"></i>' : 
+                '<i class="fa-solid fa-volume-xmark text-lg text-slate-500"></i>';
+        }
+
+        function switchTab(tabName) {
+            ['game', 'quotes', 'trophies', 'community'].forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                if (btn) {
+                    btn.classList.remove('bg-gold', 'text-slate-950');
+                    btn.classList.add('bg-slate-800', 'text-slate-300');
+                }
+            });
+
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+                activeBtn.classList.add('bg-gold', 'text-slate-950');
+            }
+        }
+
+        function renderQuotes() {
+            const container = document.getElementById('quotesGrid');
+            container.innerHTML = quotesData.map((q, idx) => `
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between hover:border-gold transition-colors">
+                    <div>
+                        <i class="fa-solid fa-quote-left text-3xl text-gold/40 mb-3 block"></i>
+                        <p class="text-sm sm:text-base text-slate-200 font-medium leading-relaxed mb-4">"${q}"</p>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-slate-700/80 pt-3">
+                        <span class="text-xs text-gold font-bold">Marileidy Paulino</span>
+                        <button onclick="shareQuote('${idx}')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                            <i class="fa-solid fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTrophies() {
+            const container = document.getElementById('trophiesGrid');
+            container.innerHTML = trophiesData.map(t => `
+                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl text-center relative overflow-hidden group hover:border-gold transition-all">
+                    <div class="w-14 h-14 mx-auto rounded-full bg-slate-900 flex items-center justify-center text-3xl mb-3 border border-slate-700">
+                        <i class="fa-solid ${t.icon}"></i>
+                    </div>
+                    <span class="text-xs text-gold font-bold bg-gold/10 px-2 py-1 rounded-full uppercase tracking-wider">${t.year}</span>
+                    <h4 class="font-teko text-2xl text-white font-bold mt-2 leading-tight">${t.title}</h4>
+                    <p class="text-xs text-slate-400 mt-1">${t.event}</p>
+                    <div class="mt-3 text-xs font-semibold text-accentGreen bg-slate-900 py-1.5 px-3 rounded-lg border border-slate-800">
+                        Marca: ${t.time}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = leaderBoardData.map((item, idx) => `
+                <div class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full ${idx === 0 ? 'bg-gold text-slate-950 font-bold' : idx === 1 ? 'bg-slate-300 text-slate-950 font-bold' : idx === 2 ? 'bg-amber-700 text-white font-bold' : 'bg-slate-800 text-slate-400'} flex items-center justify-center text-xs">
+                            ${idx + 1}
+                        </span>
+                        <span class="text-sm font-semibold text-slate-200">${item.name}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-xs font-bold text-gold">${item.score} pts</span>
+                        <span class="text-[10px] text-slate-400">${item.distance}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderComments() {
+            const container = document.getElementById('commentsContainer');
+            container.innerHTML = commentsList.map(c => `
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-slate-200 text-sm">${c.name} <span class="text-xs font-normal text-gold">(${c.city})</span></span>
+                        <span class="text-[10px] text-slate-400">${c.time}</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300">${c.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function addComment(e) {
+            e.preventDefault();
+            const name = document.getElementById('fanName').value.trim();
+            const city = document.getElementById('fanCity').value.trim();
+            const message = document.getElementById('fanMessage').value.trim();
+
+            if (name && message) {
+                commentsList.unshift({
+                    name: name,
+                    city: city || 'República Dominicana',
+                    text: message,
+                    time: 'Ahora mismo'
+                });
+                renderComments();
+                document.getElementById('commentForm').reset();
+            }
+        }
+
+        function shareQuote(idx) {
+            const text = `"${quotesData[idx]}" - Marileidy Paulino`;
+            navigator.clipboard.writeText(text);
+            showBannerQuote("¡Frase copiada al portapapeles!");
+        }
+
+        function showBannerQuote(msg) {
+            const overlay = document.getElementById('quoteOverlay');
+            overlay.innerHTML = `<div class="bg-gold text-slate-950 font-bold px-4 py-2 rounded-xl shadow-2xl inline-block text-sm floating-quote">${msg}</div>`;
+            setTimeout(() => {
+                overlay.innerHTML = '';
+            }, 3000);
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let isRunning = false;
+        let animationFrameId = null;
+        let score = 0;
+        let distance = 0;
+        let highScore = localStorage.getItem('marileidy_highscore') || 0;
+
+        document.getElementById('highScoreText').innerText = `${highScore} m`;
+
+        // Game Entities State
+        let player = {
+            x: 80,
+            y: 280,
+            width: 36,
+            height: 52,
+            velocityY: 0,
+            gravity: 0.65,
+            jumpPower: -13.5,
+            isGrounded: true,
+            frame: 0,
+            animTimer: 0
+        };
+
+        let obstacles = [];
+        let collectibles = [];
+        let obstacleTimer = 0;
+        let collectibleTimer = 0;
+        let gameSpeed = 5;
+
+        function resizeCanvas() {
+            // Keep internal canvas scale 800x400
+            canvas.width = 800;
+            canvas.height = 400;
+        }
+
+        function triggerJump() {
+            if (!isRunning) return;
+            if (player.isGrounded) {
+                player.velocityY = player.jumpPower;
+                player.isGrounded = false;
+                playSound('jump');
+            }
+        }
+
+        // Input Listeners
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                e.preventDefault();
+                if (!isRunning) {
+                    startGame();
+                } else {
+                    triggerJump();
+                }
+            }
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!isRunning) {
+                startGame();
+            } else {
+                triggerJump();
+            }
+        });
+
+        function startGame() {
+            initAudio();
+            isRunning = true;
+            score = 0;
+            distance = 0;
+            gameSpeed = 5;
+            obstacles = [];
+            collectibles = [];
+            player.y = 280;
+            player.velocityY = 0;
+            player.isGrounded = true;
+
+            document.getElementById('gameOverlay').classList.add('hidden');
+            
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop();
+        }
+
+        function gameOver() {
+            isRunning = false;
+            playSound('hit');
+
+            const meters = Math.floor(distance);
+            if (meters > highScore) {
+                highScore = meters;
+                localStorage.setItem('marileidy_highscore', highScore);
+                document.getElementById('highScoreText').innerText = `${highScore} m`;
+                showBannerQuote("¡NUEVO RÉCORD PERSONAL! 🎉");
+            }
+
+            document.getElementById('overlayTitle').innerText = "¡CARRERA FINALIZADA!";
+            document.getElementById('overlayDesc').innerText = `Recorriste ${meters} metros y alcanzaste ${score} puntos. ¡Sigue entrenando para el oro!`;
+            document.getElementById('startBtn').innerHTML = '<i class="fa-solid fa-rotate-right"></i> Correr de Nuevo';
+            document.getElementById('gameOverlay').classList.remove('hidden');
+
+            // Add player to local leaderboard simulation
+            leaderBoardData.push({ name: "Tú (Tu Marca)", score: score, distance: `${meters} m` });
+            leaderBoardData.sort((a, b) => b.score - a.score);
+            leaderBoardData = leaderBoardData.slice(0, 5);
+            renderLeaderboard();
+        }
+
+        function updateGame() {
+            distance += gameSpeed * 0.04;
+            score += 1;
+
+            // Increase speed gradually
+            if (gameSpeed < 12) {
+                gameSpeed += 0.001;
+            }
+
+            // Trigger floating inspirational quotes at distance milestones
+            const currentMeters = Math.floor(distance);
+            if (currentMeters > 0 && currentMeters % 150 === 0 && Math.floor(distance - gameSpeed * 0.04) % 150 !== 0) {
+                const randomQ = quotesData[Math.floor(Math.random() * quotesData.length)];
+                showBannerQuote(randomQ);
+            }
+
+            // Player Physics
+            player.velocityY += player.gravity;
+            player.y += player.velocityY;
+
+            const groundY = 280;
+            if (player.y >= groundY) {
+                player.y = groundY;
+                player.velocityY = 0;
+                player.isGrounded = true;
+            }
+
+            // Player Animation Frame
+            player.animTimer++;
+            if (player.animTimer % 6 === 0) {
+                player.frame = (player.frame + 1) % 4;
+            }
+
+            // Spawn Obstacles (Hurdles)
+            obstacleTimer++;
+            if (obstacleTimer > 90 / (gameSpeed / 5) + Math.random() * 40) {
+                obstacles.push({
+                    x: canvas.width + 20,
+                    y: 305,
+                    width: 24,
+                    height: 28
+                });
+                obstacleTimer = 0;
+            }
+
+            // Spawn Collectibles (Gold Medals / Trophies)
+            collectibleTimer++;
+            if (collectibleTimer > 120 + Math.random() * 60) {
+                collectibles.push({
+                    x: canvas.width + 20,
+                    y: Math.random() < 0.5 ? 230 : 270,
+                    width: 20,
+                    height: 20,
+                    type: Math.random() < 0.2 ? 'trophy' : 'medal'
+                });
+                collectibleTimer = 0;
+            }
+
+            // Move & Check Obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.x -= gameSpeed;
+
+                // Collision Detection
+                if (
+                    player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y
+                ) {
+                    gameOver();
+                    return;
+                }
+
+                if (obs.x + obs.width < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Move & Check Collectibles
+            for (let i = collectibles.length - 1; i >= 0; i--) {
+                let col = collectibles[i];
+                col.x -= gameSpeed;
+
+                // Collision Detection
+                if (
+                    player.x < col.x + col.width &&
+                    player.x + player.width > col.x &&
+                    player.y < col.y + col.height &&
+                    player.y + player.height > col.y
+                ) {
+                    playSound('coin');
+                    score += col.type === 'trophy' ? 250 : 100;
+                    collectibles.splice(i, 1);
+                    continue;
+                }
+
+                if (col.x + col.width < 0) {
+                    collectibles.splice(i, 1);
+                }
+            }
+
+            // Update UI HUD
+            document.getElementById('distanceText').innerText = `${Math.floor(distance)} m`;
+            document.getElementById('scoreText').innerText = score.toString().padStart(4, '0');
+        }
+
+        function drawGame() {
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Sky & Stadium Background
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, 250);
+            skyGradient.addColorStop(0, '#0284C7'); // Sky Blue
+            skyGradient.addColorStop(1, '#0F172A'); // Slate Dark
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, 250);
+
+            // Stadium Lights & Tribunes
+            ctx.fillStyle = '#1E293B';
+            ctx.fillRect(0, 180, canvas.width, 70);
+
+            // Light Beams
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(100 + i * 200, 0);
+                ctx.lineTo(50 + i * 200, 250);
+                ctx.lineTo(150 + i * 200, 250);
+                ctx.fill();
+            }
+
+            // 2. Draw Athletic Track (Dominican Red Track)
+            ctx.fillStyle = '#991B1B'; // Deep Red Track
+            ctx.fillRect(0, 250, canvas.width, 150);
+
+            // Track White Lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.lineWidth = 2;
+            [270, 310, 350].forEach(yPos => {
+                ctx.beginPath();
+                ctx.setLineDash([20, 15]);
+                ctx.lineDashOffset = -(distance * 10) % 35;
+                ctx.moveTo(0, yPos);
+                ctx.lineTo(canvas.width, yPos);
+                ctx.stroke();
+            });
+            ctx.setLineDash([]); // Reset dash
+
+            // 3. Draw Collectibles
+            collectibles.forEach(col => {
+                if (col.type === 'medal') {
+                    // Gold Medal
+                    ctx.fillStyle = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(col.x + 10, col.y + 10, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.stroke();
+
+                    // Star inside
+                    ctx.fillStyle = '#002D62';
+                    ctx.font = '10px FontAwesome';
+                    ctx.fillText('★', col.x + 6, col.y + 13);
+                } else {
+                    // Trophy
+                    ctx.fillStyle = '#F59E0B';
+                    ctx.fillRect(col.x + 4, col.y, 12, 14);
+                    ctx.fillRect(col.x, col.y + 14, 20, 6);
+                }
+            });
+
+            // 4. Draw Obstacles (Hurdles)
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#E2E8F0'; // White hurdle frame
+                ctx.fillRect(obs.x, obs.y, 4, obs.height);
+                ctx.fillRect(obs.x + obs.width - 4, obs.y, 4, obs.height);
+
+                // Top Red/White Bar
+                ctx.fillStyle = '#CE1126';
+                ctx.fillRect(obs.x, obs.y, obs.width, 8);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(obs.x + 6, obs.y, 6, 8);
+                ctx.fillRect(obs.x + 18, obs.y, 6, 8);
+            });
+
+            // 5. Draw Player (Marileidy Runner Sprite Silhouette/Art)
+            ctx.save();
+            ctx.translate(player.x, player.y);
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(18, player.height - 2, 16, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head
+            ctx.fillStyle = '#7C2D12'; // Skin tone
+            ctx.beginPath();
+            ctx.arc(player.width / 2, 12, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair / Headband (Dominican colors)
+            ctx.fillStyle = '#002D62';
+            ctx.fillRect(player.width / 2 - 8, 6, 16, 4);
+
+            // Uniform Body (Dominican Blue Top)
+            ctx.fillStyle = '#002D62';
+            ctx.fillRect(player.width / 2 - 8, 20, 16, 18);
+
+            // Gold Number / Details
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText('RD', player.width / 2 - 6, 32);
+
+            // Animated Running Legs
+            ctx.strokeStyle = '#7C2D12';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+
+            const legAngle1 = Math.sin(player.frame * Math.PI / 2) * 12;
+            const legAngle2 = -Math.sin(player.frame * Math.PI / 2) * 12;
+
+            // Leg 1
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 - 4, 38);
+            ctx.lineTo(player.width / 2 - 4 + legAngle1, 52);
+            ctx.stroke();
+
+            // Leg 2
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 + 4, 38);
+            ctx.lineTo(player.width / 2 + 4 + legAngle2, 52);
+            ctx.stroke();
+
+            // Running Arms
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 - 6, 22);
+            ctx.lineTo(player.width / 2 - 6 - legAngle1, 30);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(player.width / 2 + 6, 22);
+            ctx.lineTo(player.width / 2 + 6 + legAngle1, 30);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            if (!isRunning) return;
+            updateGame();
+            drawGame();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize Page
+        window.onload = function() {
+            resizeCanvas();
+            renderQuotes();
+            renderTrophies();
+            renderLeaderboard();
+            renderComments();
+            drawGame(); // Initial static frame
+        };
+    </script>
+</body>
+</html>
